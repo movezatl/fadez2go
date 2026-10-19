@@ -16,7 +16,6 @@
         "NSLocationWhenInUseUsageDescription": "Fadez2Go uses your approximate location to show fighters near you. Other people only ever see a rough distance, never where you are.",
         "NSPhotoLibraryUsageDescription": "Choose a profile photo or a photo of your gym membership.",
         "NSCameraUsageDescription": "Take a profile photo or a photo of your gym membership.",
-        "NSCalendarsUsageDescription": "Add confirmed sparring sessions to your calendar.",
         "ITSAppUsesNonExemptEncryption": false
       }
     },
@@ -61,12 +60,6 @@
         {
           "photosPermission": "Choose a profile photo or a photo of your gym membership.",
           "cameraPermission": "Take a profile photo or a photo of your gym membership."
-        }
-      ],
-      [
-        "expo-calendar",
-        {
-          "calendarPermission": "Add confirmed sparring sessions to your calendar."
         }
       ],
       "@react-native-community/datetimepicker",

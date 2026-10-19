@@ -1,5 +1,6 @@
 import { Image } from 'expo-image';
-import { BadgeCheck, MapPin, X } from 'lucide-react-native';
+import { router } from 'expo-router';
+import { BadgeCheck, ChevronLeft, MapPin, X } from 'lucide-react-native';
 import { type ReactNode } from 'react';
 import {
   ActivityIndicator,
@@ -94,6 +95,20 @@ export function Header({ title, right, left }: { title: string; right?: ReactNod
       </T>
       {right}
     </View>
+  );
+}
+
+export function BackHeader({ title, right }: { title: string; right?: ReactNode }) {
+  return (
+    <Header
+      title={title}
+      right={right}
+      left={
+        <IconButton label="Back" onPress={() => (router.canGoBack() ? router.back() : router.replace('/'))}>
+          <ChevronLeft color={colors.text} size={28} />
+        </IconButton>
+      }
+    />
   );
 }
 
@@ -437,16 +452,18 @@ export function StatusPill({ status, iAm }: { status: FadeStatus; iAm?: 'sender'
 
 export function Avatar({
   path,
+  uri: localUri,
   name,
   size = sizes.avatar.card,
   verified,
 }: {
   path: string | null | undefined;
+  uri?: string | null;
   name: string | null | undefined;
   size?: number;
   verified?: boolean;
 }) {
-  const uri = avatarUrl(path);
+  const uri = localUri ?? avatarUrl(path);
   const ring = verified ? (size >= sizes.avatar.lg ? sizes.avatarRing.hero : sizes.avatarRing.verified) : 1;
   return (
     <View
