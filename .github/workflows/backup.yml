@@ -58,7 +58,7 @@ jobs:
             --symmetric --cipher-algo AES256 -o "fadez2go-backup-$(date -u +%Y-%m-%d).tar.gz.gpg" backup.tar.gz
           rm -rf backup backup.tar.gz
 
-      - uses: actions/upload-artifact@v4
+      - uses: actions/upload-artifact@v7
         if: steps.ready.outputs.ok == 'true'
         with:
           name: fadez2go-backup-${{ github.run_id }}
