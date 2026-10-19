@@ -35,7 +35,7 @@ export async function clearPushToken(userId: string) {
   await supabase.from('profile_private').update({ push_token: null }).eq('id', userId);
 }
 
-type PushData = { type?: string; fade_id?: string; conversation_id?: string; actor_id?: string };
+type PushData = { type?: string; fade_id?: string | null; conversation_id?: string | null; actor_id?: string | null };
 
 export function routeForNotification(data: PushData) {
   if (data.fade_id) return `/fade/${data.fade_id}` as const;
