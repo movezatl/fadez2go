@@ -1,0 +1,67 @@
+# Nightly copy of the Fadez2Go database, kept as an encrypted file for 30 days.
+#
+# Does nothing until two repository secrets exist (GitHub > Settings > Secrets
+# and variables > Actions):
+#   SUPABASE_DB_URL    the database connection string from Supabase
+#                      (Project Settings > Database > Connection string > URI, "Session pooler")
+#   BACKUP_PASSPHRASE  a long password of your own; needed to open a backup, so
+#                      keep it somewhere safe. Without it the files are useless.
+#
+# See docs/BACKUPS.md for how to restore.
+name: Database backup
+
+on:
+  schedule:
+    - cron: '30 7 * * *' # every day, 3:30 AM Atlanta time (EDT)
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  backup:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SUPABASE_DB_URL: ${{ secrets.SUPABASE_DB_URL }}
+      BACKUP_PASSPHRASE: ${{ secrets.BACKUP_PASSPHRASE }}
+    steps:
+      - name: Stop if the secrets are not set up yet
+        id: ready
+        run: |
+          if [ -n "$SUPABASE_DB_URL" ] && [ -n "$BACKUP_PASSPHRASE" ]; then
+            echo "ok=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "Backup secrets are not set; nothing to do."
+          fi
+
+      - uses: supabase/setup-cli@v1
+        if: steps.ready.outputs.ok == 'true'
+        with:
+          version: latest
+
+      - name: Copy the database
+        if: steps.ready.outputs.ok == 'true'
+        run: |
+          mkdir backup
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/roles.sql --role-only
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/schema.sql
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/data.sql --data-only --use-copy
+          # Logins live in their own area of the database; without this a restore has no accounts.
+          supabase db dump --db-url "$SUPABASE_DB_URL" -f backup/auth.sql --data-only --use-copy --schema auth
+
+      - name: Lock it with the passphrase
+        if: steps.ready.outputs.ok == 'true'
+        run: |
+          tar -czf backup.tar.gz backup
+          gpg --batch --yes --pinentry-mode loopback --passphrase "$BACKUP_PASSPHRASE" \
+            --symmetric --cipher-algo AES256 -o "fadez2go-backup-$(date -u +%Y-%m-%d).tar.gz.gpg" backup.tar.gz
+          rm -rf backup backup.tar.gz
+
+      - uses: actions/upload-artifact@v4
+        if: steps.ready.outputs.ok == 'true'
+        with:
+          name: fadez2go-backup-${{ github.run_id }}
+          path: fadez2go-backup-*.tar.gz.gpg
+          retention-days: 30
+          if-no-files-found: error
