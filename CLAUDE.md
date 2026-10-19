@@ -39,7 +39,7 @@ Urgent security fixes may skip step 1 only with Mo's plain yes; review them righ
 
 ## The team (`.claude/agents/`)
 
-pm (plans and debriefs), engineer (app code), db (Supabase schema and RLS), reviewer (checks finished work), security (security analyst, defensive), grc (governance, risk, compliance and regulation), attorney (AI tech attorney: not a licensed lawyer).
+pm (plans and debriefs), ux (flows and look), engineer (app code), db (Supabase schema and RLS), reviewer (checks finished work), security (security analyst, defensive), grc (governance, risk, compliance and regulation), attorney (AI tech attorney: not a licensed lawyer).
 
 ## Checks
 
