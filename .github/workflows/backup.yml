@@ -35,7 +35,7 @@ jobs:
             echo "Backup secrets are not set; nothing to do."
           fi
 
-      - uses: supabase/setup-cli@v1
+      - uses: supabase/setup-cli@v3
         if: steps.ready.outputs.ok == 'true'
         with:
           version: latest
